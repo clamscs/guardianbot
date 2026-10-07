@@ -1,0 +1,57 @@
+name: Release
+
+on:
+  push:
+  workflow_dispatch:
+
+permissions:
+  contents: write
+
+env:
+  CARGO_TERM_COLOR: always
+
+jobs:
+  build-aarch64:
+    name: Build aarch64-unknown-linux-gnu
+    runs-on: ubuntu-latest
+    steps:
+      - uses: actions/checkout@v4
+
+      - name: Install Rust toolchain
+        uses: dtolnay/rust-toolchain@stable
+        with:
+          targets: aarch64-unknown-linux-gnu
+
+      - name: Cache cargo registry
+        uses: Swatinem/rust-cache@v2
+        with:
+          key: aarch64-unknown-linux-gnu
+
+      - name: Install cross
+        run: cargo install cross --git https://github.com/cross-rs/cross --tag v0.2.5 --locked
+
+      - name: Build release binary
+        run: cross build --release --target aarch64-unknown-linux-gnu
+
+      - name: Package binary
+        run: |
+          BIN_NAME="guardian-bot"
+          TAG="${GITHUB_REF_NAME:-manual}"
+          ARCHIVE="${BIN_NAME}-${TAG}-aarch64-unknown-linux-gnu"
+          mkdir -p "${ARCHIVE}"
+          cp "target/aarch64-unknown-linux-gnu/release/${BIN_NAME}" "${ARCHIVE}/"
+          cp Cargo.toml "${ARCHIVE}/" 2>/dev/null || true
+          tar czf "${ARCHIVE}.tar.gz" "${ARCHIVE}"
+          echo "ARCHIVE=${ARCHIVE}.tar.gz" >> "$GITHUB_ENV"
+
+      - name: Upload artifact
+        uses: actions/upload-artifact@v4
+        with:
+          name: guardian-bot-aarch64
+          path: ${{ env.ARCHIVE }}
+
+      - name: Attach to release
+        if: startsWith(github.ref, 'refs/tags/v')
+        uses: softprops/action-gh-release@v2
+        with:
+          files: ${{ env.ARCHIVE }}

@@ -1,0 +1,14 @@
+pub const MAX_GROUPS_REGULAR: usize = 480;
+pub const MAX_GROUPS_PREMIUM: usize = 950;
+pub const CACHE_TTL_SECS: u64 = 900;
+pub const CACHE_PREFIX: &str = "ck:";
+pub const JOIN_QUEUE_CAPACITY: usize = 256;
+pub const JOIN_JITTER_MIN_SECS: u64 = 35;
+pub const JOIN_JITTER_MAX_SECS: u64 = 80;
+pub const FLOOD_EXTRA_DELAY_SECS: u64 = 2;
+pub const COMMON_CHATS_LIMIT: i32 = 100;
+pub const OWNER_ID_ENV: &str = "OWNER_ID";
+pub const API_ID_ENV: &str = "API_ID";
+pub const API_HASH_ENV: &str = "API_HASH";
+pub const ACCOUNTS_DB_PATH: &str = "db/accounts.db";
+pub const GROUPS_DB_PATH: &str = "db/groups.db";
